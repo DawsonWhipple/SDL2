@@ -5,7 +5,9 @@
 * Description:    Learning SDL2 library in c++
 ****************************************************************************/
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <iostream>
+
 //main function arguments are required for SDL2
 int main(int argc, char* argv[]){
     std::cout << "SDL Works!" << std::endl;
