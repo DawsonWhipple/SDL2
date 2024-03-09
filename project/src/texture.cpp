@@ -11,7 +11,7 @@
 ****************************************************************************/
 #include <SDL.h>
 #include <iostream>
-int WAIT_TIME = 1000;
+int WAIT_TIME = 100;
 //main function arguments are required for SDL2
 int main(int argc, char* argv[]){
     //var that determines whether the game is running
