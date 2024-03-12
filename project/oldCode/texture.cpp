@@ -9,7 +9,7 @@
 *   - Able to accept user input, also draw rectangle (event.cpp)
 *   - Render a texture (texture.cpp)
 ****************************************************************************/
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <iostream>
 int WAIT_TIME = 100;
 //main function arguments are required for SDL2

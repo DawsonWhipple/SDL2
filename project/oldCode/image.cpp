@@ -9,9 +9,9 @@
 *   - Render a texture (texture.cpp)
 *   - Render an Image (image.cpp)
 ****************************************************************************/
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <iostream>
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 //main function arguments are required for SDL2
 int main(int argc, char* argv[]){

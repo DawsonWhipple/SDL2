@@ -7,7 +7,7 @@
 *   - Draw a Pixel to screen (drawpixel.cpp)
 *   - Able to accept user input, also draw rectangle (event.cpp)
 ****************************************************************************/
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <iostream>
 
 //main function arguments are required for SDL2

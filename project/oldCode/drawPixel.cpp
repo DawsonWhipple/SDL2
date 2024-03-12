@@ -4,7 +4,7 @@
 * Date:           3/8/24
 * Description:    Learning SDL2 library in c++, draws a single pixel to the screen
 ****************************************************************************/
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 //main function arguments are required for SDL2
 int main(int argc, char* argv[]){
