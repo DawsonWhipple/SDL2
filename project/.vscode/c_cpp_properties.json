@@ -4,8 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/include/sdl",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/src/include",
+                "$C:/msys64/ucrt64/include/c++/13.2.0/86_64-w64-mingw32/bits"
             ],
             "defines": [
                 "_DEBUG",
