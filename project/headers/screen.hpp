@@ -15,8 +15,8 @@ class Screen {
         //create window and renderer
         //*2 has to do with the scale and I believe resolution of monitor(?)
         //could need adjusting and not entirely sure what will be best for my monitor
-        SDL_CreateWindowAndRenderer(640*2, 480*2, 0, &window, &renderer);
-        SDL_RenderSetScale(renderer, 2, 2);
+        SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
+        //SDL_RenderSetScale(renderer, 2, 2);
     }
 
     //Need to know how to tell the computer where the pixels are to draw the 
@@ -49,6 +49,11 @@ class Screen {
         //displays to screen
         SDL_RenderPresent(renderer);
     }
+    //clears the screen of all points
+    void clear(){
+        points.clear();
+    }
+
     //go through inputs and see what they are
     //in this case only checks if user closes the window
     void input(){
