@@ -3,6 +3,9 @@
 
 #pragma once
 
+const int WINDOW_WIDTH = 640;
+const int WINDOW_HEIGHT = 480;
+
 class Screen {
     SDL_Event e;
     SDL_Window* window;
@@ -15,7 +18,8 @@ class Screen {
         //create window and renderer
         //*2 has to do with the scale and I believe resolution of monitor(?)
         //could need adjusting and not entirely sure what will be best for my monitor
-        SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
+        SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
+        //SDL_CreateWindowAndRenderer(640*2, 480*2, 0, &window, &renderer);
         //SDL_RenderSetScale(renderer, 2, 2);
     }
 
