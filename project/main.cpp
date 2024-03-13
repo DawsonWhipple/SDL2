@@ -21,9 +21,9 @@
 #include <ctime>
 #include <string>
 
-const int WINDOW_WIDTH = 1000;
-const int WINDOW_HEIGHT = 1000;
-const int SPEED = 10;
+const int WINDOW_WIDTH = 900;
+const int WINDOW_HEIGHT = 900;
+int SPEED = 10;
 
 //main function arguments are required for SDL2
 int main(int argc, char* argv[]){
@@ -50,8 +50,9 @@ int main(int argc, char* argv[]){
 	std::deque<SDL_Rect> rq;
 	//size of snake
 	int size = 1;
+	int highScore = size;
 	//create apple
-	SDL_Rect apple {rand()%99 *10, rand()%99 * 10, 10, 10};
+	SDL_Rect apple {rand()%90 *10, rand()%90 * 10, 10, 10};
 
 	// Initialize SDL_ttf
 	if (TTF_Init() == -1) {
@@ -117,7 +118,13 @@ int main(int argc, char* argv[]){
 			//increase size of snake
 			size += 10;
 			//randomly select a new location for the apple
-			apple = {rand()%99 *10, rand()%99 * 10, 10, 10};
+			apple = {rand()%90 *10, rand()%90 * 10, 10, 10};
+			std::for_each(rq.begin(), rq.end(), [&](auto& snake_segment){
+				if(apple.x = snake_segment.x && apple.y == snake_segment.y){
+					//if the apple spawned on the snake then re randomize its location
+					apple = {rand()%90 *10, rand()%90 * 10, 10, 10};
+				}
+			});
 		}
 
 		if(head.x > WINDOW_WIDTH){
@@ -179,15 +186,38 @@ int main(int argc, char* argv[]){
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
         int textWidth = textSurface->w;
         int textHeight = textSurface->h;
-        SDL_Rect renderQuad = {(WINDOW_WIDTH - textWidth) / 2, 0, textWidth, textHeight};
+        SDL_Rect renderQuad = {(WINDOW_WIDTH - textWidth) / 2, (WINDOW_HEIGHT - textHeight) - 10, textWidth, textHeight};
         SDL_RenderCopy(renderer, texture, nullptr, &renderQuad);
         SDL_FreeSurface(textSurface);
         SDL_DestroyTexture(texture);
+
+		if(size > highScore){
+			highScore = size;
+		}
+
+		// Display High score
+        SDL_Color high_textColor = {255, 255, 255, 255};
+        SDL_Surface* high_textSurface = TTF_RenderText_Solid(font, ("High Score: " + std::to_string(highScore - 1)).c_str(), high_textColor);
+        SDL_Texture* high_texture = SDL_CreateTextureFromSurface(renderer, high_textSurface);
+        int high_textWidth = high_textSurface->w;
+        int high_textHeight = high_textSurface->h;
+        SDL_Rect high_renderQuad = {(WINDOW_WIDTH - high_textWidth) / 2, 0, high_textWidth, high_textHeight};
+        SDL_RenderCopy(renderer, high_texture, nullptr, &high_renderQuad);
+        SDL_FreeSurface(high_textSurface);
+        SDL_DestroyTexture(high_texture);
 		//display
 		SDL_RenderPresent(renderer);
-		SDL_Delay(50);
+		int delay = 75;
+		if(size == 1){
+			delay = 75;
+		}
+		//increases the speed of the game on every other apple collection
+		else if(size % 20 && delay > 15){
+			delay -= 10;
+		}
+		SDL_Delay(delay);
 	}
     return 0;
 }
 // //all:
-// //	g++ -I src/include -L src/lib -o Main main.cpp -lmingw32 -lSDL2main -lSDL2
+// //	g++ -I src/include -L src/lib -o Main main.cpp -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
