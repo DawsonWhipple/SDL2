@@ -16,9 +16,12 @@
 #include <algorithm>
 //snake body will be a doubly ended queue
 #include <deque>
+#include <ctime>
 
-const int WINDOW_WIDTH = 1000/2;
-const int WINDOW_HEIGHT = 1000/2;
+const int WINDOW_WIDTH = 1000;
+const int WINDOW_HEIGHT = 1000;
+
+const int SPEED = 10;
 
 //main function arguments are required for SDL2
 int main(int argc, char* argv[]){
@@ -27,6 +30,8 @@ int main(int argc, char* argv[]){
 	auto renderer = SDL_CreateRenderer(window, -1, 0);
 	SDL_Event e;
 
+	// Seed the random number generator with the current time
+    std::srand(std::time(nullptr));
 	enum Direction{
 		DOWN, LEFT, RIGHT, UP
 	};
@@ -42,13 +47,16 @@ int main(int argc, char* argv[]){
 	//size of snake
 	int size = 1;
 	//apple container
-	std::vector<SDL_Rect> apples;
+	//std::vector<SDL_Rect> apples;
+	SDL_Rect apple {rand()%99 *10, rand()%99 * 10, 10, 10};
 
 	//create apples on the map
-	for(int i = 0; i < 100; i++){
-		SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
-    	apples.push_back(rect);
-	}
+	// for(int i = 0; i < 100; i++){
+	// 	SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
+    // 	apples.push_back(rect);
+	// }
+	// SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
+    // apples.push_back(rect);
 
 	//game loop
 	while(running){
@@ -62,16 +70,16 @@ int main(int argc, char* argv[]){
 				//check which specific key was pressed
 				switch(e.key.keysym.sym){
 					case SDLK_DOWN:
-						dir = DOWN;
+						if(dir != UP){dir = DOWN;}
 						break;
 					case SDLK_UP:
-						dir = UP;
+						if(dir != DOWN){dir = UP;}
 						break;
 					case SDLK_LEFT:
-						dir = LEFT;
+						if(dir != RIGHT){dir = LEFT;}
 						break;
 					case SDLK_RIGHT:
-						dir = RIGHT;
+						if(dir != LEFT){dir = RIGHT;}
 						break;
 				}
 			}
@@ -79,33 +87,64 @@ int main(int argc, char* argv[]){
 		//move
 		switch(dir){
 			case DOWN:
-				head.y += 10;
+				head.y += SPEED;
 				break;
 			case UP:
-				head.y -= 10;
+				head.y -= SPEED;
 				break;
 			case LEFT:
-				head.x -= 10;
+				head.x -= SPEED;
 				break;
 			case RIGHT:
-				head.x += 10;
+				head.x += SPEED;
 				break;
 		}
+		if(head.x == apple.x && head.y == apple.y){
+			//increase size of snake
+			size += 10;
+			//randomly select a new location for the apple
+			apple = {rand()%99 *10, rand()%99 * 10, 10, 10};
+		}
 		//collision detection with apple
-		std::for_each(apples.begin(), apples.end(), [&](auto& apple){
-			//check every single apple against the snake
-			if(head.x == apple.x && head.y == apple.y){
-				//increase size of snake
-				size += 10;
-				//move apple to off screen
-				apple.x = -10;
-				apple.y = -10;
-			}
-		});
+		// std::for_each(apples.begin(), apples.end(), [&](auto& apple){
+		// 	//check every single apple against the snake
+		// 	if(head.x == apple.x && head.y == apple.y){
+		// 		//increase size of snake
+		// 		size += 10;
+		// 		//move apple to off screen
+		// 		apples.pop_back();
+		// 		SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
+    	// 		apples.push_back(rect);
+		// 	}
+		// });
+		if(head.x > WINDOW_WIDTH){
+			head.x = 0;
+		}
+		if(head.x < 0){
+			head.x = WINDOW_WIDTH;
+		}
+		if(head.y > WINDOW_HEIGHT){
+			head.y = 0;
+		}
+		if(head.y < 0){
+			head.y = WINDOW_HEIGHT;
+		}
 		//collision detection with snake body
 		std::for_each(rq.begin(), rq.end(), [&](auto& snake_segment){
 			if(head.x == snake_segment.x && head.y == snake_segment.y){
 				size = 1;
+			}
+			if(snake_segment.x > WINDOW_WIDTH){
+				snake_segment.x = 0;
+			}
+			if(snake_segment.x < 0){
+				snake_segment.x = WINDOW_WIDTH;
+			}
+			if(snake_segment.y > WINDOW_HEIGHT){
+				snake_segment.y = 0;
+			}
+			if(snake_segment.y < 0){
+				snake_segment.y = WINDOW_HEIGHT;
 			}
 		});
 		//put head to the front of the queue
@@ -121,6 +160,7 @@ int main(int argc, char* argv[]){
 
 		//Draw Body
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_RenderFillRect(renderer, &head);
 		//render the whole snake including head
 		std::for_each(rq.begin(), rq.end(), [&](auto& snake_segment){
 			//draw rect to the screen
@@ -128,13 +168,14 @@ int main(int argc, char* argv[]){
 		});
 		//Draw apples
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		std::for_each(apples.begin(), apples.end(), [&](auto& apple){
-			SDL_RenderFillRect(renderer, &apple);
-		});
+		SDL_RenderFillRect(renderer, &apple);
+		// std::for_each(apples.begin(), apples.end(), [&](auto& apple){
+		// 	SDL_RenderFillRect(renderer, &apple);
+		// });
 
 		//display
 		SDL_RenderPresent(renderer);
-		SDL_Delay(25);
+		SDL_Delay(50);
 	}
     return 0;
 }
