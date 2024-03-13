@@ -3,6 +3,9 @@
 * Author:         Dawson Whipple
 * Date:           3/8/24
 * Description:    game of snake made using SDL2
+*                 currently very low chance of apple spawning on snake segment
+*                 doesn't save high score between rounds
+*                 not sure if speed up is working properly
 * Checklist:      each of the following states can be found in the associated .cpp files as backups
 *   - Draw a Pixel to screen (drawpixel.cpp)
 *   - Able to accept user input, also draw rectangle (event.cpp)
