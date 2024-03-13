@@ -18,7 +18,7 @@ const float _y_ROTATE = 0.01;
 const float _z_ROTATE = 0.04;
 
 const int X_WINDOW_CENTER = WINDOW_WIDTH/4;
-const int Y_WINDOW_CENTER = WINDOW_HEIGHT/4;
+const int Y_WINDOW_CENTER = WINDOW_HEIGHT/2;
 
 struct vec3{
 	float x, y, z;
@@ -88,16 +88,28 @@ int main(int argc, char* argv[]){
 
 	//all points in the cube
 	//the vertices
-	std::vector<vec3> points{
-		{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 100, 100},
-		{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 100, 100},
-		{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 200, 100},
-		{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 200, 100},
+	// std::vector<vec3> points{
+	// 	{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 100, 100},
+	// 	{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 100, 100},
+	// 	{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 200, 100},
+	// 	{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 200, 100},
 
-		{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 100, 200},
-		{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 100, 200},
-		{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 200, 200},
-		{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 200, 200},
+	// 	{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 100, 200},
+	// 	{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 100, 200},
+	// 	{X_WINDOW_CENTER + 200, Y_WINDOW_CENTER + 200, 200},
+	// 	{X_WINDOW_CENTER + 100, Y_WINDOW_CENTER + 200, 200},
+	// };
+	//Draws relative to center point of the screen
+	std::vector<vec3> points{
+		{X_WINDOW_CENTER - 50, Y_WINDOW_CENTER - 50, -50},
+		{X_WINDOW_CENTER + 50, Y_WINDOW_CENTER - 50, -50},
+		{X_WINDOW_CENTER + 50, Y_WINDOW_CENTER + 50, -50},
+		{X_WINDOW_CENTER - 50, Y_WINDOW_CENTER + 50, -50},
+
+		{X_WINDOW_CENTER - 50, Y_WINDOW_CENTER - 50, 50},
+		{X_WINDOW_CENTER + 50, Y_WINDOW_CENTER - 50, 50},
+		{X_WINDOW_CENTER + 50, Y_WINDOW_CENTER + 50, 50},
+		{X_WINDOW_CENTER - 50, Y_WINDOW_CENTER + 50, 50},
 	};
 	
 	//defines all connections for the vertices of the square

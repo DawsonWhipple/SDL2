@@ -19,8 +19,8 @@ class Screen {
         //*2 has to do with the scale and I believe resolution of monitor(?)
         //could need adjusting and not entirely sure what will be best for my monitor
         SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
-        //SDL_CreateWindowAndRenderer(640*2, 480*2, 0, &window, &renderer);
-        //SDL_RenderSetScale(renderer, 2, 2);
+        // SDL_CreateWindowAndRenderer(640*2, 480*2, 0, &window, &renderer);
+        // SDL_RenderSetScale(renderer, 2, 2);
     }
 
     //Need to know how to tell the computer where the pixels are to draw the 
