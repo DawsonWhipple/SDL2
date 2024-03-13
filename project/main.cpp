@@ -11,16 +11,18 @@
 *	- Rotate a 3d cube (cubeRotate.cpp) (RotatingCube.exe)
 ****************************************************************************/
 //for snake game screen.h is not required
+#include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <vector>
 #include <algorithm>
 //snake body will be a doubly ended queue
 #include <deque>
 #include <ctime>
+#include <string>
 
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 1000;
-
 const int SPEED = 10;
 
 //main function arguments are required for SDL2
@@ -32,13 +34,15 @@ int main(int argc, char* argv[]){
 
 	// Seed the random number generator with the current time
     std::srand(std::time(nullptr));
+	//possible directions the snake can go
 	enum Direction{
 		DOWN, LEFT, RIGHT, UP
 	};
 
+	//game rule
 	bool running = true;
 	//direction the snake is going
-	int dir = 0;
+	int dir = UP;
 	//create the head of the snake at the center of the screen
 	SDL_Rect head {WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 10, 10};
 
@@ -46,17 +50,26 @@ int main(int argc, char* argv[]){
 	std::deque<SDL_Rect> rq;
 	//size of snake
 	int size = 1;
-	//apple container
-	//std::vector<SDL_Rect> apples;
+	//create apple
 	SDL_Rect apple {rand()%99 *10, rand()%99 * 10, 10, 10};
 
-	//create apples on the map
-	// for(int i = 0; i < 100; i++){
-	// 	SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
-    // 	apples.push_back(rect);
-	// }
-	// SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
-    // apples.push_back(rect);
+	// Initialize SDL_ttf
+	if (TTF_Init() == -1) {
+		std::cerr << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << std::endl;
+		return -1;
+	}
+
+	// Load font
+	TTF_Font* font = TTF_OpenFont("fonts/Peepo.ttf", 24);
+	if (font == nullptr) {
+		std::cerr << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
+		// Clean up and exit
+		TTF_Quit();
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		return -1;
+	}
 
 	//game loop
 	while(running){
@@ -99,24 +112,14 @@ int main(int argc, char* argv[]){
 				head.x += SPEED;
 				break;
 		}
+		//collision detection with apple
 		if(head.x == apple.x && head.y == apple.y){
 			//increase size of snake
 			size += 10;
 			//randomly select a new location for the apple
 			apple = {rand()%99 *10, rand()%99 * 10, 10, 10};
 		}
-		//collision detection with apple
-		// std::for_each(apples.begin(), apples.end(), [&](auto& apple){
-		// 	//check every single apple against the snake
-		// 	if(head.x == apple.x && head.y == apple.y){
-		// 		//increase size of snake
-		// 		size += 10;
-		// 		//move apple to off screen
-		// 		apples.pop_back();
-		// 		SDL_Rect rect = {rand()%100 *10, rand()%100 * 10, 10, 10};
-    	// 		apples.push_back(rect);
-		// 	}
-		// });
+
 		if(head.x > WINDOW_WIDTH){
 			head.x = 0;
 		}
@@ -169,15 +172,22 @@ int main(int argc, char* argv[]){
 		//Draw apples
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 		SDL_RenderFillRect(renderer, &apple);
-		// std::for_each(apples.begin(), apples.end(), [&](auto& apple){
-		// 	SDL_RenderFillRect(renderer, &apple);
-		// });
 
+		// Display score
+        SDL_Color textColor = {255, 255, 255, 255};
+        SDL_Surface* textSurface = TTF_RenderText_Solid(font, ("Score: " + std::to_string(size - 1)).c_str(), textColor);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        int textWidth = textSurface->w;
+        int textHeight = textSurface->h;
+        SDL_Rect renderQuad = {(WINDOW_WIDTH - textWidth) / 2, 0, textWidth, textHeight};
+        SDL_RenderCopy(renderer, texture, nullptr, &renderQuad);
+        SDL_FreeSurface(textSurface);
+        SDL_DestroyTexture(texture);
 		//display
 		SDL_RenderPresent(renderer);
 		SDL_Delay(50);
 	}
     return 0;
 }
-//all:
-//	g++ -I src/include -L src/lib -o Main main.cpp -lmingw32 -lSDL2main -lSDL2
+// //all:
+// //	g++ -I src/include -L src/lib -o Main main.cpp -lmingw32 -lSDL2main -lSDL2
