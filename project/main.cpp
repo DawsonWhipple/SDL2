@@ -39,7 +39,6 @@ int main(int argc, char* argv[]){
 	enum Direction{
 		DOWN, LEFT, RIGHT, UP
 	};
-
 	//game rule
 	bool running = true;
 	//direction the snake is going
