@@ -1,12 +1,19 @@
 #include <SDL2/SDL.h>
+#include <cstdlib>
+#include <iostream>
+#include <time.h>  
 #include <vector>
+#include <tuple>
+#include <algorithm>
+#include <ctime>
 
 #pragma once
 
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 480;
-
+const int WINDOW_WIDTH = 200;
+const int WINDOW_HEIGHT = 200;
+const int CELL_SIZE = 10;
 class Screen {
+
     SDL_Event e;
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -18,9 +25,9 @@ class Screen {
         //create window and renderer
         //*2 has to do with the scale and I believe resolution of monitor(?)
         //could need adjusting and not entirely sure what will be best for my monitor
-        SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
-        // SDL_CreateWindowAndRenderer(640*2, 480*2, 0, &window, &renderer);
-        // SDL_RenderSetScale(renderer, 2, 2);
+        //SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
+        SDL_CreateWindowAndRenderer(WINDOW_WIDTH*4, WINDOW_HEIGHT*4, 0, &window, &renderer);
+        SDL_RenderSetScale(renderer, 4, 4);
     }
 
     //Need to know how to tell the computer where the pixels are to draw the 
@@ -60,12 +67,40 @@ class Screen {
 
     //go through inputs and see what they are
     //in this case only checks if user closes the window
-    void input(){
+    void input(std::vector<std::vector<int>>& display){
         //check if the user clicked 'x' on the window, exits program
-        while(SDL_PollEvent(&e)){
-            if(e.type == SDL_QUIT){
-                SDL_Quit();
-                exit(0);
+        // Check for input events
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    SDL_Quit();
+                    exit(0);
+                    break;
+                //this case is specifically for gameOfLife
+                case SDL_MOUSEBUTTONDOWN: {
+                    
+                    // Get the mouse position
+                    int mouseX, mouseY;
+                    SDL_GetMouseState(&mouseX, &mouseY);
+
+                    // Convert mouse coordinates to cell coordinates
+                    int cellX = mouseX / 4;
+                    int cellY = mouseY / 4;
+
+                    // Ensure the cell coordinates are within the bounds
+                    if (cellX >= 0 && cellX < WINDOW_WIDTH && cellY >= 0 && cellY < WINDOW_HEIGHT) {
+                        // Set the cell state to alive
+                        display[cellY][cellX] = 1;
+                        display[cellY+1][cellX] = 1;
+                        display[cellY][cellX+1] = 1;
+                        display[cellY-1][cellX] = 1;
+                        display[cellY][cellX-1] = 1;
+                        //std::cout << "MOUSE";
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
         }
     }
