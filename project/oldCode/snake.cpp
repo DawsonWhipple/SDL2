@@ -123,12 +123,12 @@ int main(int argc, char* argv[]){
 			size += 10;
 			//randomly select a new location for the apple
 			apple = {rand()%90 *10, rand()%90 * 10, 10, 10};
-			std::for_each(rq.begin(), rq.end(), [&](auto& snake_segment){
-				if(apple.x = snake_segment.x && apple.y == snake_segment.y){
-					//if the apple spawned on the snake then re randomize its location
-					apple = {rand()%90 *10, rand()%90 * 10, 10, 10};
-				}
-			});
+			// std::for_each(rq.begin(), rq.end(), [&](auto& snake_segment){
+			// 	if(apple.x = snake_segment.x && apple.y == snake_segment.y){
+			// 		//if the apple spawned on the snake then re randomize its location
+			// 		apple = {rand()%90 *10, rand()%90 * 10, 10, 10};
+			// 	}
+			// });
 		}
 
 		if(head.x > WINDOW_WIDTH){
