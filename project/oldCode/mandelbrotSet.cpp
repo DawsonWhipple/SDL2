@@ -2,7 +2,7 @@
 * Title:          SDL2main.cpp
 * Author:         Dawson Whipple
 * Date:           3/8/24
-* Description:    Learning SDL2 library in c++, this file continually updates as I learn new things
+* Description:    Dynamically renders the mandelbrot set to screen, shades regions according to length of iterations to exit the set
 * Checklist:      each of the following states can be found in the associated .cpp files as backups
 *   - Draw a Pixel to screen (drawpixel.cpp)
 *   - Able to accept user input, also draw rectangle (event.cpp)
