@@ -6,13 +6,14 @@
 #include <tuple>
 #include <algorithm>
 #include <ctime>
+#include <cmath>
 
 #pragma once
 
-const int WINDOW_WIDTH = 900;
-const int WINDOW_HEIGHT = 900;
+const int WINDOW_WIDTH = 400;
+const int WINDOW_HEIGHT = 400;
 const int CELL_SIZE = 10;
-const int SCALE = 1;
+const int SCALE = 2;
 
 class Screen {
 
@@ -46,7 +47,6 @@ class Screen {
         // Add the new point to the points vector
         pointLocations.push_back(point);
     }
-
     //this function draws the pixesl but does not display them to the screen
     void drawPixel(float x, float y, int r, int g, int b){
         //creates a new point struct and adds it to the points vector
@@ -81,6 +81,7 @@ class Screen {
     //clears the screen of all points
     void clear(){
         pointLocations.clear();
+        pointColors.clear();
     }
     //go through inputs and see what they are
     //in this case only checks if user closes the window
@@ -100,7 +101,7 @@ class Screen {
     }
     //go through inputs and see what they are
     //in this case only checks if user closes the window
-    void inputMandelbrot(float *newMin, float *newMax){
+    void inputMandelbrot(float *newMin, float *newMax, bool *autozoom){
         //check if the user clicked 'x' on the window, exits program
         // Check for input events
         while (SDL_PollEvent(&e)) {
@@ -113,15 +114,25 @@ class Screen {
                     //check which specific key was pressed
                     switch(e.key.keysym.sym){
                         case SDLK_DOWN:
-                            std::cout << *newMin << '\n';
-                            *newMin -= 0.5;
-                            //*max += 0.5;
+                            *newMin += 0.01;
                             break;
                         case SDLK_UP:
-                            //*min += 0.5;
-                            *newMax -= 0.5;
+                            *newMin -= 0.01;
+                            break;
+                        case SDLK_LEFT:
+                            *newMax -= 0.01;
+                            //*newMin -= 0.1;
+                            break;
+                        case SDLK_RIGHT:
+                            *newMax += 0.01;
+                            //*newMin += 0.01;
+                            break;
+                        case SDLK_a:
+                            *autozoom = !*autozoom;
                             break;
                     }
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
                     break;
                 default:
                     break;

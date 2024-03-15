@@ -13,7 +13,10 @@
 *   - Game of Life (gameOfLife.cpp) (gameOfLife.exe)
 ****************************************************************************/
 #include "headers/screen.hpp" // Include the header file with the Screen class
-#include <map>
+#include <math.h>
+
+#define START_POS -0.5
+#define START_ZOOM (WINDOW_WIDTH * 0.25296875L) - 200
 
 // Function to update the game state for the next generation
 void updateGame() {
@@ -24,7 +27,9 @@ void updateGame() {
         }
     }
 }
-
+// OldRange = (OldMax - OldMin)  
+// NewRange = (NewMax - NewMin)  
+// NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
 float mapValue(float oldValue, float oldMin, float oldMax, float newMin, float newMax) {
     float oldRange = oldMax - oldMin;
     float newRange = newMax - newMin;
@@ -35,25 +40,32 @@ float mapValue(float oldValue, float oldMin, float oldMax, float newMin, float n
 int main(int argc, char* argv[]) {
     // Initialize SDL and create a Screen object
     Screen screen;  
-    float newMax = 2;
-    float newMin = -2; 
-    float newRange = (newMax - newMin);
-    int count = 0;
+
+    SDL_FPoint center = {START_POS, START_POS};
+
+
     int oldMax = WINDOW_HEIGHT;
     int oldMin = 0;
     int OldRange = (oldMax - oldMin);
+    bool autozoom = false;
+    float increment = 0.01;
+    //float incrementCount = 0.001;
+    long int zoomCount = 0;
+    center = {-1.315180982097868, 0.073481649996795};
+
+    float newMax = 1;
+    float newMin = -1; 
+    std::cout << newMin;
     // Main loop
     while (true) {
         // Process input events
-        screen.inputMandelbrot(&newMax, &newMin);
+        screen.inputMandelbrot(&newMax, &newMin, &autozoom);
         // Update the game state for the next generation
         //updateGame();
 
         // Clear the screen
         screen.clear();
-        // OldRange = (OldMax - OldMin)  
-        // NewRange = (NewMax - NewMin)  
-        // NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
+
         // Draw the game state to the screen
         int color = 50;
         int r = color;
@@ -61,13 +73,7 @@ int main(int argc, char* argv[]) {
         int b = color;
         
         int maxIterations = 100;
-        // float newMax = 2;
-        // float newMin = -2;
-        //std::cout << "New Max" << newMax << '\n';
-        //std::cout << "New Min" << newMin << '\n';
-        //newRange = (newMax - newMin);
-        //std::cout << "New Range" << newRange << '\n';
-        //count++;
+        
         for (int x = 0; x < WINDOW_WIDTH; ++x) {
             for (int y = 0; y < WINDOW_HEIGHT; ++y) {
                 //mapping size of screen onto the size of the mandelbrot set
@@ -79,9 +85,6 @@ int main(int argc, char* argv[]) {
                 float b = imaginary;
                 float ca = real;
                 float cb = imaginary;
-                if((x+y)%20 == 0){
-                    //std::cout << "Mapped values - a: " << a << ", b: " << b << std::endl; // Debug output
-                }
                 
                 int n = 0;
                 while(n < maxIterations){
@@ -99,34 +102,10 @@ int main(int argc, char* argv[]) {
 
                 // Map the iteration count to a brightness value
                 int bright = mapValue(n, 0, maxIterations, 0, 255);
-                // float a = mapValue(x, 0, WINDOW_WIDTH, newMin, newMax);
-                // float b = mapValue(y, 0, WINDOW_HEIGHT, newMin, newMax);
-                // // float a = (static_cast<float>(x) * newRange / WINDOW_WIDTH) + newMin;
-                // // float b = (static_cast<float>(y) * newRange / WINDOW_HEIGHT) + newMin;
-                // // float a = (((x - 0) * newRange) / OldRange) + newMin;
-                // // float b = (((y - 0) * newRange) / OldRange) + newMin;
-                
-                // //stores the original values of a and b
-                // float ca = a;
-                // float cb = b;
-                // int n = 0;
-                // //checks for if a given value will tend towards infinity
-                // while(n < maxIterations){
-                //     float aa = a*a - b*b;
-                //     float bb = 2 * a * b;
-
-                //     a = aa + ca;
-                //     b = bb + cb;
-                //     if(abs(a+b) > 16){
-                //         break;
-                //     }
-                //     n++;
-                // }
-                // int bright = mapValue(n, 0, maxIterations, 0, 255);
-                //std::cout << n << '\n';
                 if (n == 100){
                     bright = 0;
                 }
+                
                 screen.drawPixel(x, y, bright, bright, bright);
                 
                 //this block makes some cool patterns but not very useful
@@ -147,14 +126,33 @@ int main(int argc, char* argv[]) {
                 // screen.drawPixel(j, i, r, g, b);
             }
         }
-        // oldMin = newMin;
-        // oldMax = newMax;
-        // OldRange = newRange;
+        //increment = 0.01;
+        
+        if(autozoom){
+            if((newMin + (increment*2)) >= center.x){
+                increment /= 10.0;
+            }
+            newMin += increment;
+            newMax -= increment;
+            zoomCount++;
+            std::cout << increment << '\n';
+        }
+        // if(newMin < center.x && newMax > center.y){
+        //     if(newMin >= ((center.x - 1) + (increment*100))){
+        //         increment = increment / 10.0;
+        //     }
+        //     if(autozoom){
+        //         newMin += increment;
+        //         newMax -= increment;
+        //     }
+        // }
+        
 
         // Display the updated screen
         screen.show();
-        // Delay for a short interval
-        SDL_Delay(25);
+        
+        //Delay for a short interval
+        //SDL_Delay(10);
     }
 
     return 0;
