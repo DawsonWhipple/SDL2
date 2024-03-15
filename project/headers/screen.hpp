@@ -9,15 +9,19 @@
 
 #pragma once
 
-const int WINDOW_WIDTH = 200;
-const int WINDOW_HEIGHT = 200;
+const int WINDOW_WIDTH = 900;
+const int WINDOW_HEIGHT = 900;
 const int CELL_SIZE = 10;
+const int SCALE = 1;
+
 class Screen {
 
     SDL_Event e;
     SDL_Window* window;
     SDL_Renderer* renderer;
-    std::vector<SDL_FPoint> points;
+    std::vector<SDL_FPoint> pointLocations;
+    std::vector<SDL_Color> pointColors; // Vector of SDL_Color for storing RGB colors
+
     public:
     //constructor
     Screen(){
@@ -26,8 +30,8 @@ class Screen {
         //*2 has to do with the scale and I believe resolution of monitor(?)
         //could need adjusting and not entirely sure what will be best for my monitor
         //SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
-        SDL_CreateWindowAndRenderer(WINDOW_WIDTH*4, WINDOW_HEIGHT*4, 0, &window, &renderer);
-        SDL_RenderSetScale(renderer, 4, 4);
+        SDL_CreateWindowAndRenderer(WINDOW_WIDTH*SCALE, WINDOW_HEIGHT*SCALE, 0, &window, &renderer);
+        SDL_RenderSetScale(renderer, SCALE, SCALE);
     }
 
     //Need to know how to tell the computer where the pixels are to draw the 
@@ -40,7 +44,21 @@ class Screen {
         // Create a new point with x and y coordinates
         SDL_FPoint point = {x, y};
         // Add the new point to the points vector
-        points.push_back(point);
+        pointLocations.push_back(point);
+    }
+
+    //this function draws the pixesl but does not display them to the screen
+    void drawPixel(float x, float y, int r, int g, int b){
+        //creates a new point struct and adds it to the points vector
+        //function push_back() apparently does the same thing
+        // Create a new point with x and y coordinates
+        SDL_FPoint point = {x, y};
+        // Create a new SDL_Color struct for the specified RGB values
+        SDL_Color color = {static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), 255};
+        // Add the new point to the points vector
+        pointLocations.push_back(point);
+        // Add the corresponding color to the pointColors vector
+        pointColors.push_back(color);
     }
     //shows pixels to the screen
     //The most 'SDL' function in this .h file
@@ -50,19 +68,19 @@ class Screen {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        //set draw color to white now so we can actually see the pixels
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         //go through every pixel and draw it to the screen
         //does not display to screen yet
-        for(auto& point : points){
-            SDL_RenderDrawPointF(renderer, point.x, point.y);
+        for(int i = 0; i < pointLocations.size(); i++){
+            //set draw color of each pixel
+            SDL_SetRenderDrawColor(renderer, pointColors[i].r, pointColors[i].g, pointColors[i].b, pointColors[i].a);
+            SDL_RenderDrawPointF(renderer, pointLocations[i].x, pointLocations[i].y);
         }
         //displays to screen
         SDL_RenderPresent(renderer);
     }
     //clears the screen of all points
     void clear(){
-        points.clear();
+        pointLocations.clear();
     }
     //go through inputs and see what they are
     //in this case only checks if user closes the window
@@ -74,6 +92,36 @@ class Screen {
                 case SDL_QUIT:
                     SDL_Quit();
                     exit(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    //go through inputs and see what they are
+    //in this case only checks if user closes the window
+    void inputMandelbrot(float *newMin, float *newMax){
+        //check if the user clicked 'x' on the window, exits program
+        // Check for input events
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    SDL_Quit();
+                    exit(0);
+                    break;
+                case SDL_KEYDOWN:
+                    //check which specific key was pressed
+                    switch(e.key.keysym.sym){
+                        case SDLK_DOWN:
+                            std::cout << *newMin << '\n';
+                            *newMin -= 0.5;
+                            //*max += 0.5;
+                            break;
+                        case SDLK_UP:
+                            //*min += 0.5;
+                            *newMax -= 0.5;
+                            break;
+                    }
                     break;
                 default:
                     break;
@@ -100,8 +148,8 @@ class Screen {
                     SDL_GetMouseState(&mouseX, &mouseY);
 
                     // Convert mouse coordinates to cell coordinates
-                    int cellX = mouseX / 4;
-                    int cellY = mouseY / 4;
+                    int cellX = mouseX / SCALE;
+                    int cellY = mouseY / SCALE;
 
                     // Ensure the cell coordinates are within the bounds
                     if (cellX >= 0 && cellX < WINDOW_WIDTH && cellY >= 0 && cellY < WINDOW_HEIGHT) {

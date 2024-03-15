@@ -13,88 +13,148 @@
 *   - Game of Life (gameOfLife.cpp) (gameOfLife.exe)
 ****************************************************************************/
 #include "headers/screen.hpp" // Include the header file with the Screen class
-
-// Function to determine if a cell at position (x, y) will be alive in the next generation
-bool isAlive(const std::vector<std::vector<int>>& game, int x, int y) {
-    // Store the coordinates of neighboring cells
-    static const std::vector<std::pair<int, int>> neighbors = {
-        {-1, -1}, {-1, 0}, {-1, 1},
-        {0, -1},           {0, 1},
-        {1, -1},  {1, 0},  {1, 1}
-    };
-
-    // Calculate the number of alive neighbors
-    int alive = 0;
-    for (const auto& [dx, dy] : neighbors) {
-        int nx = x + dx;
-        int ny = y + dy;
-        if (nx >= 0 && nx < WINDOW_WIDTH && ny >= 0 && ny < WINDOW_HEIGHT && game[ny][nx] == 1) {
-            ++alive;
-        }
-    }
-
-    // Apply the rules of the game
-    if (game[y][x] == 1) {
-        return alive == 2 || alive == 3;
-    } else {
-        return alive == 3;
-    }
-}
+#include <map>
 
 // Function to update the game state for the next generation
-void updateGame(std::vector<std::vector<int>>& display, std::vector<std::vector<int>>& swap) {
+void updateGame() {
     // Compute the next generation
     for (int i = 0; i < WINDOW_WIDTH; ++i) {
         for (int j = 0; j < WINDOW_HEIGHT; ++j) {
-            swap[j][i] = isAlive(display, i, j) ? 1 : 0;
+            //swap[j][i] = isAlive(display, i, j) ? 1 : 0;
         }
     }
-
-    // Copy the new state back to the display
-    std::swap(display, swap);
 }
+
+float mapValue(float oldValue, float oldMin, float oldMax, float newMin, float newMax) {
+    float oldRange = oldMax - oldMin;
+    float newRange = newMax - newMin;
+    return (((oldValue - oldMin) * newRange) / oldRange) + newMin;
+}
+
 
 int main(int argc, char* argv[]) {
     // Initialize SDL and create a Screen object
-    Screen screen;
-
-    // Create vectors to hold the current and next game states
-    std::vector<std::vector<int>> display(WINDOW_HEIGHT, std::vector<int>(WINDOW_WIDTH));
-    std::vector<std::vector<int>> swap(WINDOW_HEIGHT, std::vector<int>(WINDOW_WIDTH));
-
-    // Seed the random number generator
-    std::srand(std::time(nullptr));
-
-    // Populate the initial game state with random values
-    for (auto& row : display) {
-        std::generate(row.begin(), row.end(), []() { return std::rand() % 2; });
-    }
-
+    Screen screen;  
+    float newMax = 2;
+    float newMin = -2; 
+    float newRange = (newMax - newMin);
+    int count = 0;
+    int oldMax = WINDOW_HEIGHT;
+    int oldMin = 0;
+    int OldRange = (oldMax - oldMin);
     // Main loop
     while (true) {
         // Process input events
-        screen.input(display);
-
+        screen.inputMandelbrot(&newMax, &newMin);
         // Update the game state for the next generation
-        updateGame(display, swap);
+        //updateGame();
 
         // Clear the screen
         screen.clear();
-
+        // OldRange = (OldMax - OldMin)  
+        // NewRange = (NewMax - NewMin)  
+        // NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
         // Draw the game state to the screen
-        for (int i = 0; i < WINDOW_WIDTH; ++i) {
-            for (int j = 0; j < WINDOW_HEIGHT; ++j) {
-                if (display[j][i] == 1) {
-                    screen.pixel(i, j);
+        int color = 50;
+        int r = color;
+        int g = color;
+        int b = color;
+        
+        int maxIterations = 100;
+        // float newMax = 2;
+        // float newMin = -2;
+        //std::cout << "New Max" << newMax << '\n';
+        //std::cout << "New Min" << newMin << '\n';
+        //newRange = (newMax - newMin);
+        //std::cout << "New Range" << newRange << '\n';
+        //count++;
+        for (int x = 0; x < WINDOW_WIDTH; ++x) {
+            for (int y = 0; y < WINDOW_HEIGHT; ++y) {
+                //mapping size of screen onto the size of the mandelbrot set
+                float real = mapValue(x, 0, WINDOW_WIDTH, newMin, newMax);
+                float imaginary = mapValue(y, 0, WINDOW_HEIGHT, newMin, newMax);
+
+                
+                float a = real;
+                float b = imaginary;
+                float ca = real;
+                float cb = imaginary;
+                if((x+y)%20 == 0){
+                    //std::cout << "Mapped values - a: " << a << ", b: " << b << std::endl; // Debug output
                 }
+                
+                int n = 0;
+                while(n < maxIterations){
+                    float aa = a * a - b * b;
+                    float bb = 2 * a * b;
+
+                    a = aa + ca;
+                    b = bb + cb;
+
+                    if(abs(a+b) > 16){
+                        break;
+                    }
+                    n++;
+                }
+
+                // Map the iteration count to a brightness value
+                int bright = mapValue(n, 0, maxIterations, 0, 255);
+                // float a = mapValue(x, 0, WINDOW_WIDTH, newMin, newMax);
+                // float b = mapValue(y, 0, WINDOW_HEIGHT, newMin, newMax);
+                // // float a = (static_cast<float>(x) * newRange / WINDOW_WIDTH) + newMin;
+                // // float b = (static_cast<float>(y) * newRange / WINDOW_HEIGHT) + newMin;
+                // // float a = (((x - 0) * newRange) / OldRange) + newMin;
+                // // float b = (((y - 0) * newRange) / OldRange) + newMin;
+                
+                // //stores the original values of a and b
+                // float ca = a;
+                // float cb = b;
+                // int n = 0;
+                // //checks for if a given value will tend towards infinity
+                // while(n < maxIterations){
+                //     float aa = a*a - b*b;
+                //     float bb = 2 * a * b;
+
+                //     a = aa + ca;
+                //     b = bb + cb;
+                //     if(abs(a+b) > 16){
+                //         break;
+                //     }
+                //     n++;
+                // }
+                // int bright = mapValue(n, 0, maxIterations, 0, 255);
+                //std::cout << n << '\n';
+                if (n == 100){
+                    bright = 0;
+                }
+                screen.drawPixel(x, y, bright, bright, bright);
+                
+                //this block makes some cool patterns but not very useful
+                // if (b >= 255){
+                //     r = 0;
+                //     g = 0;
+                //     b = 0;
+                // }
+                // else if (g >= 255){
+                //     b = (((i*j - 0) * NewRange)/OldRange) + 0;
+                // }
+                // else if(r >= 255){
+                //     g = (((i*j - 0) * NewRange)/OldRange) + 0;
+                // }
+                // else{
+                //     r = (((i*j - 0) * NewRange)/OldRange) + 0;
+                // }
+                // screen.drawPixel(j, i, r, g, b);
             }
         }
+        // oldMin = newMin;
+        // oldMax = newMax;
+        // OldRange = newRange;
 
         // Display the updated screen
         screen.show();
-
         // Delay for a short interval
-        SDL_Delay(50);
+        SDL_Delay(25);
     }
 
     return 0;
