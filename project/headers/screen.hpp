@@ -64,7 +64,23 @@ class Screen {
     void clear(){
         points.clear();
     }
-
+    //go through inputs and see what they are
+    //in this case only checks if user closes the window
+    void input(){
+        //check if the user clicked 'x' on the window, exits program
+        // Check for input events
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    SDL_Quit();
+                    exit(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    //overloaded function for gameOfLife.cpp
     //go through inputs and see what they are
     //in this case only checks if user closes the window
     void input(std::vector<std::vector<int>>& display){
