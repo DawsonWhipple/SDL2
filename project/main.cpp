@@ -28,15 +28,6 @@ void updateGame() {
         }
     }
 }
-// OldRange = (OldMax - OldMin)  
-// NewRange = (NewMax - NewMin)  
-// NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
-float mapValue(float oldValue, float oldMin, float oldMax, float newMin, float newMax) {
-    float oldRange = oldMax - oldMin;
-    float newRange = newMax - newMin;
-    return (((oldValue - oldMin) * newRange) / oldRange) + newMin;
-}
-
 
 int main(int argc, char* argv[]) {
     // Initialize SDL and create a Screen object

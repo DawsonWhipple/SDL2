@@ -14,7 +14,14 @@ const int WINDOW_WIDTH = 400;
 const int WINDOW_HEIGHT = 400;
 const int CELL_SIZE = 10;
 const int SCALE = 2;
-
+// OldRange = (OldMax - OldMin)  
+// NewRange = (NewMax - NewMin)  
+// NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
+float mapValue(float oldValue, float oldMin, float oldMax, float newMin, float newMax) {
+    float oldRange = oldMax - oldMin;
+    float newRange = newMax - newMin;
+    return (((oldValue - oldMin) * newRange) / oldRange) + newMin;
+}
 class Screen {
 
     SDL_Event e;
@@ -133,6 +140,12 @@ class Screen {
                     }
                     break;
                 case SDL_MOUSEBUTTONDOWN:
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    x = mapValue(x, 0, WINDOW_WIDTH, *newMin, *newMax);
+                    y = mapValue(y, 0, WINDOW_HEIGHT, *newMin, *newMax);
+                    *newMin = (*newMin + x)/2;
+                    *newMax = (*newMax + y)/2;
                     break;
                 default:
                     break;
